@@ -1,6 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
+import { useTodoContext } from "../../hooks/useTodoContext";
 import axios from "axios";
 
 interface FormValues {
@@ -8,14 +9,11 @@ interface FormValues {
   priority?: "high" | "low";
 }
 
-interface FormProps {
-  onSuccess: () => void;
-}
-
-function TodoForm({ onSuccess }: FormProps) {
+function TodoForm() {
   const form = useForm<FormValues>({});
   const { register, handleSubmit, control, formState } = form;
   const { errors } = formState;
+  const { state, dispatch } = useTodoContext();
 
   const onSubmit = async (data: FormValues) => {
     const preparedData = { ...data };
@@ -23,14 +21,15 @@ function TodoForm({ onSuccess }: FormProps) {
       delete preparedData.priority;
     }
 
-    console.log("Form submission: ", preparedData);
     try {
       const response = await axios.post(
         "http://localhost:3000/todo",
         preparedData
       );
-      console.log("response", response);
-      onSuccess();
+      console.log("response data", response.data);
+      const { _id, todo, priority } = response.data;
+
+      dispatch({ type: "add_todo", payload: { _id, todo, priority } });
     } catch (error) {
       console.error(error);
     }
