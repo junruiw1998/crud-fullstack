@@ -5,7 +5,7 @@ import { handleServerError } from "../validators/serverError";
 
 const getAllTodos = async (req: Request, res: Response) => {
   try {
-    const todos = await Todo.find({}).sort({ createdAt: -1 });
+    const todos = await Todo.find({}).sort({ createdAt: 1 });
     res.status(200).json(todos);
   } catch (error) {
     handleServerError(res, error);

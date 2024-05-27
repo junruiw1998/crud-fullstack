@@ -1,24 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { useTodoContext } from "../../hooks/useTodoContext";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { delete_todo } from "../../features/todo/todoSlice";
+import type { RootState } from "../../store/store";
 import axios from "axios";
-
 interface Todo {
   _id: string;
   todo: string;
-  priority?: "high" | "low";
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
+  priority?: string;
+}
+interface TodoDisplayProps {
+  todos: Todo[]; // Define props interface
+  onDelete: () => void;
 }
 
 function TodoDisplay() {
-  const { state, dispatch } = useTodoContext();
+  const dispatch = useDispatch();
+  const todos = useSelector((state: RootState) => state.todo);
+
   const handleDeleteTodo = async (deleteId: string) => {
     try {
       const response = await axios.delete(
         `http://localhost:3000/todo/${deleteId}`
       );
-      dispatch({ type: "delete_todo", payload: deleteId });
+      dispatch(delete_todo(deleteId));
     } catch (error) {
       console.error(error);
     }
@@ -27,7 +31,7 @@ function TodoDisplay() {
     <div>
       <h2>Display: </h2>
       <div>
-        {state.todos.map((todo) => {
+        {todos.map((todo) => {
           return (
             <div key={todo._id}>
               <p style={{ display: "inline" }}>
@@ -41,5 +45,4 @@ function TodoDisplay() {
     </div>
   );
 }
-
 export default TodoDisplay;

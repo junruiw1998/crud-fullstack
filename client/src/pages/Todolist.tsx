@@ -1,33 +1,24 @@
 import React, { useState, useEffect } from "react";
 import TodoForm from "../components/todolist/TodoForm";
 import TodoDisplay from "../components/todolist/TodoDisplay";
-import { useTodoContext } from "../hooks/useTodoContext";
+import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-
-interface Todo {
-  _id: string;
-  todo: string;
-  priority?: "high" | "low";
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
+import { get_todos } from "../features/todo/todoSlice";
 
 function Todolist() {
-  const { dispatch } = useTodoContext();
+  const dispatch = useDispatch();
   const fetchTodos = async () => {
     try {
       const response = await axios.get("http://localhost:3000/todo");
 
-      dispatch({ type: "get_todos", payload: response.data });
+      dispatch(get_todos(response.data));
     } catch (error) {
       console.error(error);
     }
   };
   useEffect(() => {
     fetchTodos();
-  }, [dispatch]);
-
+  }, []);
   return (
     <div>
       <h1>Todo List</h1>
@@ -36,5 +27,4 @@ function Todolist() {
     </div>
   );
 }
-
 export default Todolist;
